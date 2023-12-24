@@ -75,7 +75,7 @@ def dims(grid):
 d4 = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
 
-file = open("input/t19.txt", "r")
+file = open("input/t19t.txt", "r")
 score = 0
 grid = []
 
@@ -135,83 +135,81 @@ for key in rules:
 #             a =
 #
 
-
-def get_base_constraints():
-    return [[1, 4001] for _ in range(4)]
-
-
-def copy_constraints(constraints):
-    return [row[:] for row in constraints]
-
-
-def flip_constraints(constraints):
-    possible_constraints = []
-    ret = []
-    for j in constraints:
-        temp = []
-        if j[0] != 1:
-            temp.append([1, j[0]])
-        if j[1] != 4001:
-            temp.append([j[1], 4001])
-        if not temp:
-            return []
-        possible_constraints.append(temp)
-    for c0 in possible_constraints[0]:
-        for c1 in possible_constraints[1]:
-            for c2 in possible_constraints[2]:
-                for c3 in possible_constraints[3]:
-                    ret.append([c0, c1, c2, c3])
-    return ret
-
-asum = rsum = 0
-
 def dfs(cur, constraints):
+    def combine_constraints(nx):
+        new_cons = []
+        for a, b in zip(constraints, nx):
+            if a[0] is not None and b[0] is not None:
+                i = max(a[0], b[0])
+            elif a[0] is not None:
+                i = a[0]
+            else:
+                i = b[0]
+            if a[1] is not None and b[1] is not None:
+                j = min(a[1], b[1])
+            elif a[1] is not None:
+                j = a[1]
+            else:
+                j = b[1]
+            new_cons.append([i, j])
+        return new_cons
+
     # print(cur, constraints)
     if cur == 'A':
         # print('im in an A')
         temp = 1
         for j in constraints:
             j0, j1 = j
+            if j0 is None:
+                j0 = 1
+            if j1 is None:
+                j1 = 4001
             temp *= j1 - j0
-        # asum += max(temp, 0)
+
         return max(temp, 0)
     elif cur == 'R':
-        # temp = 1
-        # for j in constraints:
-        #     j0, j1 = j
-        #     temp *= j1 - j0
-        # rsum += max(temp, 0)
         return 0
 
     for j in constraints:
-        if j[0] >= j[1]:
+        if j[1] is not None and j[0] is not None and j[1] <= j[0]:
             return 0
 
     ret = 0
     subrules, base = rules[cur]
-    constraints = copy_constraints(constraints)
-
+    nx = make_empty_grid(lambda: None, 2, 4, 2)
+    # print(subrules, base)
     for var, sign, val, dest in subrules:
         # print(var, sign, val, dest)
         v = 'xmas'.index(var)
-        for_this = copy_constraints(constraints)
         if sign < 0:
-            for_this[v][1] = min(for_this[v][1], val)
-            constraints[v][0] = max(constraints[v][0], val)
+            if nx[v][1] is not None:
+                nx[v][1] = min(nx[v][1], val)
+            else:
+                nx[v][1] = val
         else:
-            for_this[v][0] = max(for_this[v][0], val+ 1)
-            constraints[v][1] = min(constraints[v][1], val + 1)
-        ret += dfs(dest, for_this)
+            if nx[v][0] is not None:
+                nx[v][0] = max(nx[v][0], val + 1)
+            else:
+                nx[v][0] = val + 1
+        ret += dfs(dest, combine_constraints(nx))
 
-    # for j in constraints:
-    #     if j[1] is not None and j[0] is not None and j[1] <= j[0]:
-    #         return ret
+    for j in constraints:
+        if j[1] is not None and j[0] is not None and j[1] <= j[0]:
+            return ret
 
-    ret += dfs(base, constraints)
+    possible_constraints = []
+    for j in constraints:
+        if j[1] is not None and j[0] is not None:
+            possible_constraints.append([[None, j[0]], [j[1], None]])
+        else:
+            possible_constraints.append([[j[1], j[0]]])
+    for c0 in possible_constraints[0]:
+        for c1 in possible_constraints[1]:
+            for c2 in possible_constraints[2]:
+                for c3 in possible_constraints[3]:
+                    ret += dfs(base, [c0, c1, c2, c3])
     return ret
 
 
-score = dfs('in', get_base_constraints())
+score = dfs('in', make_empty_grid(lambda: None, 2, 4, 2))
 print(score)
-
-# print(asum, rsum, asum + rsum)
