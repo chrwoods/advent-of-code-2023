@@ -87,19 +87,11 @@ n, m = dims(grid)
 
 unvisited = set()
 shortest_path = {}
-h = {}
-
-end_node = (n, m, 0)
-shortest_path[end_node] = 10 ** 10
-unvisited.add(end_node)
-h[end_node] = 10 ** 10
-
 prev = {}
 for i in range(n):
     for j in range(m):
         for d in range(4):
             shortest_path[(i, j, d)] = 10 ** 10
-            h[(i, j, d)] = shortest_path[(i, j, d)] + distt((i, j, d), end_node)
             unvisited.add((i, j, d))
 #
 # def get_edges_v0(node):
@@ -122,31 +114,9 @@ for i in range(n):
 #         dist += grid[i][j]
 #     return edges
 
-goal_nodes = {}
-for d in [0, 1]:
-    i = n - 1
-    j = m - 1
-    dist = grid[i][j]
-    for _ in range(2):
-        i -= d4[d][0]
-        j -= d4[d][1]
-        if not 0 <= i < n or not 0 <= j < m:
-            break
-        dist += grid[i][j]
-    for _ in range(7):
-        i -= d4[d][0]
-        j -= d4[d][1]
-        if not 0 <= i < n or not 0 <= j < m:
-            break
-        goal_nodes[(i, j, d)] = dist
-        dist += grid[i][j]
-
-
 def get_edges(node):
     i, j, d = node
     edges = []
-    if node in goal_nodes:
-        edges.append((end_node, goal_nodes[node]))
     ds = [(d + 1) % 4, (d - 1) % 4]
     dist = 0
     for _ in range(3):
@@ -174,19 +144,15 @@ def get_edges(node):
 # shortest_path[(0, 0, 1)] = 0
 
 shortest_path[(0, 1, 0)] = grid[0][1]
-h[(0, 1, 0)] = distt((0, 1, 0), end_node)
-shortest_path[(1, 0, 1)] = grid[1][0]
-h[(1, 0, 1)] = distt((1, 0, 1), end_node)
+# shortest_path[(1, 0, 1)] = grid[1][0]
+
 
 while unvisited:
     cur = None
     for node in unvisited:
-        if not cur or h[node] < h[cur]:
+        if not cur or shortest_path[node] < shortest_path[cur]:
             cur = node
     if shortest_path[cur] == 10 ** 10:
-        break
-
-    if cur == end_node:
         break
 
     neighbors = get_edges(cur)
@@ -195,21 +161,51 @@ while unvisited:
         tentative = shortest_path[cur] + dist
         if tentative < shortest_path[nx]:
             shortest_path[nx] = tentative
-            h[nx] = tentative + distt(nx, end_node)
             prev[nx] = cur
+
 
     unvisited.remove(cur)
 
+for d in range(4):
+    print(shortest_path[(n - 1, m - 1, d)])
 
-# for k, v in shortest_path.items():
-#     print(k, v)
-#
+# post DFS
+ret = 10 ** 10
+endpoint = None
+for d in [0, 1]:
+    i = n - 1
+    j = m - 1
+    # ret = min(ret, shortest_path[(i, j, d)])
+    dist = grid[i][j]
+
+    for _ in range(2):
+        i -= d4[d][0]
+        j -= d4[d][1]
+        if not 0 <= i < n or not 0 <= j < m:
+            break
+        dist += grid[i][j]
+    for _ in range(7):
+        i -= d4[d][0]
+        j -= d4[d][1]
+        if not 0 <= i < n or not 0 <= j < m:
+            break
+        # ret = min(ret, shortest_path[(i, j, d)] + dist)
+        if shortest_path[(i, j, d)] + dist < ret:
+            ret = shortest_path[(i, j, d)] + dist
+            endpoint = (i, j, d)
+        dist += grid[i][j]
+
+print('sol', ret)
+
+for k, v in shortest_path.items():
+    print(k, v)
+
 outgrid = make_empty_grid(lambda: '.', 2, n, m)
-cur = prev[end_node]
+cur = endpoint
 while cur:
     outgrid[cur[0]][cur[1]] = '>v<^'[cur[2]]
     cur = prev.get(cur)
 
 print_grid(outgrid)
 
-print('sol', shortest_path[end_node])
+print('sol', ret)
