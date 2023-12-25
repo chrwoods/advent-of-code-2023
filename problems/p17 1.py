@@ -75,7 +75,7 @@ def dims(grid):
 d4 = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
 
-file = open("input/t17.txt", "r")
+file = open("input/t17t.txt", "r")
 score = 0
 grid = []
 
@@ -125,7 +125,7 @@ def get_edges(node):
         if not 0 <= i < n or not 0 <= j < m:
             return edges
         dist += grid[i][j]
-    for _ in range(10 - 3):
+    for _ in range(10 - 4):
         for d2 in ds:
             i2 = i + d4[d2][0]
             j2 = j + d4[d2][1]
@@ -140,11 +140,7 @@ def get_edges(node):
         dist += grid[i][j]
     return edges
 
-# shortest_path[(0, 0, 0)] = 0
-# shortest_path[(0, 0, 1)] = 0
-
-shortest_path[(0, 1, 0)] = grid[0][1]
-# shortest_path[(1, 0, 1)] = grid[1][0]
+shortest_path[(0, 0, 0)] = 0
 
 
 while unvisited:
@@ -169,30 +165,18 @@ while unvisited:
 for d in range(4):
     print(shortest_path[(n - 1, m - 1, d)])
 
-# post DFS
 ret = 10 ** 10
-endpoint = None
 for d in [0, 1]:
     i = n - 1
     j = m - 1
-    # ret = min(ret, shortest_path[(i, j, d)])
+    ret = min(ret, shortest_path[(i, j, d)])
     dist = grid[i][j]
-
-    for _ in range(2):
+    for _ in range(10):
         i -= d4[d][0]
         j -= d4[d][1]
         if not 0 <= i < n or not 0 <= j < m:
             break
-        dist += grid[i][j]
-    for _ in range(7):
-        i -= d4[d][0]
-        j -= d4[d][1]
-        if not 0 <= i < n or not 0 <= j < m:
-            break
-        # ret = min(ret, shortest_path[(i, j, d)] + dist)
-        if shortest_path[(i, j, d)] + dist < ret:
-            ret = shortest_path[(i, j, d)] + dist
-            endpoint = (i, j, d)
+        ret = min(ret, shortest_path[(i, j, d)] + dist)
         dist += grid[i][j]
 
 print('sol', ret)
@@ -201,7 +185,7 @@ for k, v in shortest_path.items():
     print(k, v)
 
 outgrid = make_empty_grid(lambda: '.', 2, n, m)
-cur = endpoint
+cur = (n - 1, m - 1, 0)
 while cur:
     outgrid[cur[0]][cur[1]] = '>v<^'[cur[2]]
     cur = prev.get(cur)
