@@ -1,7 +1,6 @@
 import bisect
 import collections
 import functools
-from datetime import datetime
 from os import truncate
 import regex as re
 from collections import defaultdict as dd
@@ -71,7 +70,6 @@ grid = []
 # def is_valid_backtrack(a, b):
 #     for i in range()
 
-@functools.lru_cache
 def is_valid(a, b, idx):
     if not b:
         return 1 if not any(a[j] == '#' for j in range(idx, len(a))) else 0
@@ -105,9 +103,9 @@ def is_valid(a, b, idx):
 #     return ret
 
 def is_valid_wrap_v2(a, b):
-    return is_valid('.' + a + '.', tuple(b), 0)
+    return is_valid(list('.' + a + '.'), b, 0)
 
-start = datetime.now()
+
 for i, line in enumerate(file.readlines()):
     line = line.strip()
     a, b = line.split(' ')
@@ -130,7 +128,6 @@ for i, line in enumerate(file.readlines()):
     # print(br)
     # print(re.findall(br, a))
     print('line', i, 'score', score)
-    # print(datetime.now() - start)
 
 
 # print(is_valid_wrap('?###????????', [3,2,1]))
