@@ -146,7 +146,6 @@ for s in '|-LJ7F':
         d = 1
         
     path = [start]
-    outside_points = []
     i += d4[d][0]
     j += d4[d][1]
     while 0 <= i < n and 0 <= j < m and (i, j) != start:
@@ -154,17 +153,6 @@ for s in '|-LJ7F':
         if d < 0:
             break
         path.append((i, j))
-
-        outside_points.append((i + d4[d - 1][0], j + d4[d - 1][1]))
-        if grid[i][j] == '7' and d == 1:
-            outside_points.append((i + d4[d - 2][0], j + d4[d - 2][1]))
-        if grid[i][j] == 'J' and d == 2:
-            outside_points.append((i + d4[d - 2][0], j + d4[d - 2][1]))
-        if grid[i][j] == 'L' and d == 3:
-            outside_points.append((i + d4[d - 2][0], j + d4[d - 2][1]))
-        if grid[i][j] == 'F' and d == 0:
-            outside_points.append((i + d4[d - 2][0], j + d4[d - 2][1]))
-
         i += d4[d][0]
         j += d4[d][1]
     if (i, j) == start and new_dir(s, d) >= 0:
@@ -177,40 +165,23 @@ outgrid = make_empty_grid(lambda: ' ', 2, n, m)
 for i, j in path:
     # outgrid[i][j] = '#'
     outgrid[i][j] = grid[i][j]
-    # outgrid[i][j] = 'O'
 
-# for i, j in outside_points:
-#     if 0 <= i < n and 0 <= j < m and outgrid[i][j] == ' ':
-#         outgrid[i][j] = '.'
-#
-# print_grid(outgrid)
+print_grid(outgrid)
 
-
-def mark_outside(point):
-    if not 0 <= point[0] < n or not 0 <= point[1] < m:
-        return
-    if outgrid[point[0]][point[1]] != ' ':
-        return
-    visited = {point}
-    q = [point]
-    outgrid[point[0]][point[1]] = 'O'
-    while q:
-        i, j = q.pop()
-        for x, y in d4:
-            i2, j2 = i + x, j + y
-            if 0 <= i2 < n and 0 <= j2 < m and (i2, j2) not in visited:
-                # visited.add((i2, j2))
-                if outgrid[i2][j2] == ' ':
-                    outgrid[i2][j2] = 'O'
-                    visited.add((i2, j2))
-                    q.append((i2, j2))
+visited = {(0, 0)}
+q = [(0, 0)]
+outgrid[0][0] = '#'
+while q:
+    i, j = q.pop()
+    for x, y in d4:
+        i2, j2 = i + x, j + y
+        if 0 <= i2 < n and 0 <= j2 < m and (i2, j2) not in visited:
+            # visited.add((i2, j2))
+            if outgrid[i2][j2] == '.':
+                outgrid[i2][j2] = '#'
+                visited.add((i2, j2))
+                q.append((i2, j2))
                 
-for outside_point in outside_points:
-    mark_outside(outside_point)
-
-
 # print_grid(outgrid)
-# inverse_grid = [['#' if c == ' ' else ' ' for c in row] for row in outgrid]
-# print_grid(inverse_grid)
-
-print(sum(sum(1 if c == ' ' else 0 for c in row) for row in outgrid))
+ 
+print(sum(sum(1 if c == '.' else 0 for c in row) for row in outgrid))

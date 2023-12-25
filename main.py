@@ -1,1 +1,1 @@
-from problems import p25
+from problems import p10
