@@ -78,7 +78,7 @@ def dims(grid):
 
 d4 = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
-file = open("input/t20.txt", "r")
+file = open("input/t20m.txt", "r")
 score = 0
 ffd = {}
 ffs = {}
@@ -121,6 +121,7 @@ for _ in range(0):
     needed = nx
 
 print(needed)
+needed = {('dl', 0), ('bt', 0), ('fr', 0), ('rv', 0)} # 1 level down from rs
 def run(i):
     pulses = [(x, 0, 'broadcaster') for x in broadcaster]
     while pulses:
@@ -152,8 +153,8 @@ def run(i):
             
             pass
 
-for i in range(1):
-    run(i)
+for i in range(10000):
+    run(i + 1)
     if any(cs['rs'].values()):
         print(i, cs['rs'])
     
@@ -165,3 +166,5 @@ print()
 print('Conjunctions')
 for a, b in cs.items():
     print(a, b)
+
+print(3739 * 3821 * 3943 * 4001)
