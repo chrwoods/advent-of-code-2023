@@ -6,6 +6,8 @@ Hints:
 - Day 20: "just draw out the circuitry"
 - Day 21: "please actually look at the real input instead of the sample input, it's a lot simpler than you think"
 
+Next year I'll hopefully draft an actual template library with stuff like A* and automatic cycle detection so I don't have to write that manually every time.
+
 Final Rankings:
 ```
 You have 20 points.
